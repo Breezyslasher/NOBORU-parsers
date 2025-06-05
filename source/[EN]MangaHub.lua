@@ -1,7 +1,7 @@
 MangaHub = Parser:new("MangaHub", "https://1manga.co/", "ENG", "MANGAHUBEN", 4)
 
 ---Cookie jar file changed, can't exploit for now :c
-MangaHub.Disabled = true
+MangaHub.Disabled = false
 MangaHub.Filters = {
 	{
 		Name = "Genre",
