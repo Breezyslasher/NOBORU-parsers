@@ -1,6 +1,6 @@
-MangaOwl = Parser:new("MangaOwl", "https://mangaowl.net", "ENG", "MANGAOWLEN", 2)
+MangaOwl = Parser:new("MangaOwl", "https://mangaowl.io", "ENG", "MANGAOWLEN", 2)
 
-MangaOwl.Disabled = true
+MangaOwl.Disabled = false
 
 local function stringify(string)
 	return string:gsub(
