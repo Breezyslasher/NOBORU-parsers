@@ -1,4 +1,4 @@
-XoXoComics = Parser:new("XoXoComics", "https://www.xoxocomics.com", "ENG", "XOXOCEN", 4)
+XoXoComics = Parser:new("XoXoComics", "https://www.xoxocomics.net", "ENG", "XOXOCEN", 4)
 
 local function stringify(string)
 	return string:gsub(
