@@ -1,4 +1,4 @@
-MangaHub = Parser:new("MangaHub", "https://mangahub.io", "ENG", "MANGAHUBEN", 4)
+MangaHub = Parser:new("MangaHub", "https://1manga.co/", "ENG", "MANGAHUBEN", 4)
 
 ---Cookie jar file changed, can't exploit for now :c
 MangaHub.Disabled = true
