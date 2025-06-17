@@ -1,4 +1,4 @@
-MangaHub = Parser:new("MangaHub", "https://1manga.co/", "ENG", "MANGAHUBEN", 5)
+MangaHub = Parser:new("1Manga", "https://1manga.co/", "ENG", "MANGAHUBEN", 5)
 
 ---Cookie jar file changed, can't exploit for now :c  
 MangaHub.Disabled = false
@@ -29,6 +29,7 @@ MangaHub.Filters = {
 			"Sports",
 			"School life",
 			"Smut",
+
 			"Mystery",
 			"Psychological",
 			"Shounen ai",
@@ -243,7 +244,7 @@ function MangaHub:prepareChapter(chapter, dest_table)
 	local t = dest_table
 	local pages = tonumber(content:match(">1/(%d+)</p>") or "0")
 	for i=1, pages do
-		t[#t + 1] = "https://img.mghubcdn.com/file/imghub/"..slug.."/"..num.."/"..i..".jpg"
+		t[#t + 1] = "https://imgx.mghcdn.com/"..slug.."/"..num.."/"..i..".jpg"
 	end
 end
 
@@ -254,7 +255,7 @@ function MangaHub:prepareChapter(chapter, dest_table)
 		file,
 		{
 			Type = "StringRequest",
-			Link = "https://api.mghubcdn.com/graphql",
+			Link = "https://api.mghcdn.com/graphql",
 			Table = file,
 			Index = "string",
 			HttpMethod = POST_METHOD,
@@ -269,7 +270,7 @@ function MangaHub:prepareChapter(chapter, dest_table)
 	local t = dest_table
 	local pages = content:match('"pages":"{(.-)}","noAd"') or ""
 	for link in pages:gmatch(':\\"(.-)\\"') do
-		t[#t + 1] = "https://img.mghubcdn.com/file/imghub/" .. link
+		t[#t + 1] = "https://imgx.mghcdn.com/" .. link
 	end
 end
 --]]
