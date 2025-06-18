@@ -1,4 +1,4 @@
-MangaReader = Parser:new("MangaRead", "https://www.mangaread.org", "ENG", "MANGAREADEREN", 4)
+MangaReader = Parser:new("MangaRead", "https://www.mangaread.org", "ENG", "MANGAREADEREN", 1)
 MangaReader.Disabled = false
 --[[MangaReader.Tags = {"Action", "Adventure", "Comedy", "Demons", "Drama", "Ecchi", "Fantasy", "Gender Bender", "Harem", "Historical", "Horror", "Josei", "Magic", "Martial Arts", "Mature", "Mecha", "Military", "Mystery", "One Shot", "Psychological", "Romance", "School Life", "Sci-Fi", "Seinen", "Shoujo", "Shoujoai", "Shounen", "Shounenai", "Slice of Life", "Smut", "Sports", "Super Power", "Supernatural", "Tragedy", "Vampire", "Yaoi", "Yuri"}
 MangaReader.TagValues = {
