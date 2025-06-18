@@ -1,4 +1,4 @@
-MangaReader = Parser:new("MangaRead", "https://www.mangaread.org", "ENG", "MANGAREADEREN", 1)
+MangaReader = Parser:new("MangaRead", "https://www.mangaread.org", "ENG", "MANGAREADEREN", 4)
 MangaReader.Disabled = false
 --[[MangaReader.Tags = {"Action", "Adventure", "Comedy", "Demons", "Drama", "Ecchi", "Fantasy", "Gender Bender", "Harem", "Historical", "Horror", "Josei", "Magic", "Martial Arts", "Mature", "Mecha", "Military", "Mystery", "One Shot", "Psychological", "Romance", "School Life", "Sci-Fi", "Seinen", "Shoujo", "Shoujoai", "Shounen", "Shounenai", "Slice of Life", "Smut", "Sports", "Super Power", "Supernatural", "Tragedy", "Vampire", "Yaoi", "Yuri"}
 MangaReader.TagValues = {
@@ -175,7 +175,7 @@ function MangaReader:getPopularManga(page, dt)
 	for block in content:gmatch('<div id="manga%-item%-%d+".-</div>%s*</div>') do
 		local Img = block:match('<img.-src="([^"]+)"')
 		local Link, Name = block:match('<h3 class="h5">%s*<a href="([^"]+)">%s*(.-)%s*</a>')
-
+    
 		if Img and Link and Name then
 			dt[#dt + 1] = CreateManga(stringify(Name), Link, Img, self.ID, Link)
 			dt.NoPages = false
@@ -233,13 +233,21 @@ function MangaReader:loadChapterPage(link, dest_table)
 end
 function MangaReader:getChapters(manga, dt)
 	local content = downloadContent(manga.Link)
-	for Link, Name in content:gmatch('<li class="wp%-manga%-chapter.-href="([^"]+)">([^<]+)</a>') do
-		dt[#dt + 1] = {
-			Name = stringify(Name),
-			Link = Link:gsub(manga.Link, ""), -- remove base if needed
-			Pages = {},
-			Manga = manga
-		}
+
+	for li in content:gmatch('<li class="wp%-manga%-chapter[^>]-">(.-)</li>') do
+		local link = li:match('<a[^>]-href="([^"]+)"')
+		local name = li:match('<a[^>]*>(.-)</a>')
+
+		if link and name then
+			-- Remove tags inside the <a> and decode entities
+			local cleanName = name:gsub("<[^>]->", ""):gsub("^%s+", ""):gsub("%s+$", "")
+			dt[#dt + 1] = {
+				Name = stringify(cleanName),
+				Link = link:gsub(manga.Link, ""), -- optionally remove base
+				Pages = {},
+				Manga = manga
+			}
+		end
 	end
 end
 
