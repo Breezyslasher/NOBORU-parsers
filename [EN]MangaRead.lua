@@ -1,6 +1,6 @@
-MangaReader = Parser:new("MangaRead", "https://www.mangaread.org", "ENG", "MANGAREADEREN", 4)
+MangaReader = Parser:new("MangaRead", "https://www.mangaread.org", "ENG", "MANGAREADEREN", 1)
 MangaReader.Disabled = false
-MangaReader.Tags = {"Action", "Adventure", "Comedy", "Demons", "Drama", "Ecchi", "Fantasy", "Gender Bender", "Harem", "Historical", "Horror", "Josei", "Magic", "Martial Arts", "Mature", "Mecha", "Military", "Mystery", "One Shot", "Psychological", "Romance", "School Life", "Sci-Fi", "Seinen", "Shoujo", "Shoujoai", "Shounen", "Shounenai", "Slice of Life", "Smut", "Sports", "Super Power", "Supernatural", "Tragedy", "Vampire", "Yaoi", "Yuri"}
+--[[MangaReader.Tags = {"Action", "Adventure", "Comedy", "Demons", "Drama", "Ecchi", "Fantasy", "Gender Bender", "Harem", "Historical", "Horror", "Josei", "Magic", "Martial Arts", "Mature", "Mecha", "Military", "Mystery", "One Shot", "Psychological", "Romance", "School Life", "Sci-Fi", "Seinen", "Shoujo", "Shoujoai", "Shounen", "Shounenai", "Slice of Life", "Smut", "Sports", "Super Power", "Supernatural", "Tragedy", "Vampire", "Yaoi", "Yuri"}
 MangaReader.TagValues = {
 	["Action"] = "action",
 	["Adventure"] = "adventure",
@@ -124,7 +124,7 @@ MangaReader.GenreKeys = {
 	["Vampire"] = 35,
 	["Yaoi"] = 36,
 	["Yuri"] = 37
-}
+}]]--
 
 local function stringify(string)
 	return string:gsub(
@@ -184,18 +184,35 @@ function MangaReader:getPopularManga(page, dt)
 	end
 end
 
-function MangaReader:getTagManga(page, dt, tag)
-	self:getManga(self.Link .. "/manga/?m_orderby=new-manga?page=" .. (self.TagValues[tag] or "") .. "/" .. ((page - 1) * 30), dt)
-end
+--[[function MangaReader:getTagManga(page, dt, tag)
+	self:getManga(self.Link .. "/?s=&post_type=wp-manga&genre[]=" .. (self.TagValues[tag] or "") .. "&paged=" .. ((page - 1) * 30), dt)
+end]]--
 
 function MangaReader:searchManga(search, page, dt, tags)
-	local url = self.Link .. "/?s=" .. search:gsub(" ", "+") .. "&post_type=wp-manga"
-	local content = downloadContent(url)
+	local query = search and search:gsub(" ", "+") or ""
+	page = page or 1
 
+	local url = self.Link .. "/?s=" .. query .. "&post_type=wp-manga&paged=" .. page
+	local content = downloadContent(url)
+	if not content then return end
+
+	local covers = {}
+	-- Parse the image blocks
+	for block in content:gmatch('<div class="col%-4 col%-md%-2">(.-)</a>') do
+		local mangaUrl = block:match('<a href="([^"]+)"')
+		local imgSrc = block:match('<img[^>]-src="([^"]+)"')
+		if mangaUrl and imgSrc then
+			covers[mangaUrl] = imgSrc
+		end
+	end
+
+	-- Parse the title blocks
 	for link, name in content:gmatch('<div class="post%-title">.-<a href="([^"]+)">([^<]+)</a>') do
-		dt[#dt + 1] = CreateManga(name, link, "", self.ID, self.Link)
+		local image = covers[link] or ""
+		dt[#dt + 1] = CreateManga(name, link, image, self.ID, self.Link)
 	end
 end
+
 
 
 	
@@ -225,44 +242,19 @@ function MangaReader:getChapters(manga, dt)
 		}
 	end
 end
-MangaPanda = MangaReader:new("MangaPanda", "https://www.mangapanda.com", "ENG", "MANGAPANDAEN", 1)
 
-MangaPanda.Disabled = true
-MangaPanda.Filters = nil
-
-function MangaPanda:getManga(link, dt)
-	local content = downloadContent(link)
+function MangaReader:getLatestManga(page, dt)
+	local content = downloadContent(self.Link .. "/manga/?m_orderby=new-manga&page=" .. page)
 	dt.NoPages = true
-	for ImageLink, Link, Name in content:gmatch('image:url%(\'(%S-)\'.-<div class="manga_name">.-<a href="(%S-)">(.-)</a>') do
-		dt[#dt + 1] = CreateManga(stringify(Name), Link, ImageLink, self.ID, self.Link .. Link)
-		dt.NoPages = false
-		coroutine.yield(false)
+
+	for block in content:gmatch('<div id="manga%-item%-%d+".-</div>%s*</div>') do
+		local Img = block:match('<img.-src="([^"]+)"')
+		local Link, Name = block:match('<h3 class="h5">%s*<a href="([^"]+)">%s*(.-)%s*</a>')
+
+		if Img and Link and Name then
+			dt[#dt + 1] = CreateManga(stringify(Name), Link, Img, self.ID, Link)
+			dt.NoPages = false
+			coroutine.yield(false)
+		end
 	end
-end
-
-function MangaPanda:searchManga(search, page, dt)
-	self:getManga(self.Link .. "/search/?w=" .. search .. "&rd=&status=&order=&genre=&p=" .. ((page - 1) * 30), dt)
-end
-
-function MangaPanda:getChapters(manga, dt)
-	local content = downloadContent(self.Link .. manga.Link):match('id="chapterlist"(.+)$') or ""
-	for Link, Name, subName in content:gmatch('chico_manga.-<a href%="/.-(/%S-)">(.-)</a>(.-)</td>') do
-		dt[#dt + 1] = {
-			Name = stringify(Name .. subName),
-			Link = Link,
-			Pages = {},
-			Manga = manga
-		}
-	end
-end
-
-function MangaPanda:prepareChapter(chapter, dt)
-	local count = downloadContent(self.Link .. chapter.Manga.Link .. chapter.Link .. "#"):match("</select> of (.-)<") or 0
-	for i = 1, count do
-		dt[i] = self.Link .. chapter.Manga.Link .. chapter.Link .. "/" .. i
-	end
-end
-
-function MangaPanda:loadChapterPage(link, dest_table)
-	dest_table.Link = downloadContent(link):match('id="img".-src="(.-)"')
 end
