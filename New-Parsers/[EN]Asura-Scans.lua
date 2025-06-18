@@ -152,3 +152,4 @@ function Asura:getLatestManga(page, dt)
 		end
 	end
 end
+ 
