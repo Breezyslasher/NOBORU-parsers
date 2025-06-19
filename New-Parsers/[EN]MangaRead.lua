@@ -241,15 +241,23 @@ function MangaReader:getChapters(manga, dt)
 		local name = li:match('<a[^>]*>(.-)</a>')
 
 		if link and name then
-			-- Remove tags inside the <a> and decode entities
 			local cleanName = name:gsub("<[^>]->", ""):gsub("^%s+", ""):gsub("%s+$", "")
 			dt[#dt + 1] = {
 				Name = stringify(cleanName),
-				Link = link:gsub(manga.Link, ""), -- optionally remove base
+				Link = link:gsub(manga.Link, ""), -- optional cleanup
 				Pages = {},
 				Manga = manga
 			}
 		end
+	end
+
+	-- 🔁 Reverse the chapter list to be oldest → newest
+	local reversed = {}
+	for i = #dt, 1, -1 do
+		reversed[#reversed + 1] = dt[i]
+	end
+	for i = 1, #reversed do
+		dt[i] = reversed[i]
 	end
 end
 
