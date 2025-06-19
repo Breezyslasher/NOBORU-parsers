@@ -251,13 +251,13 @@ function MangaReader:getChapters(manga, dt)
 		end
 	end
 
-	-- 🔁 Reverse the chapter list to be oldest → newest
-	local reversed = {}
+	-- 🔁 Reverse the order of chapters so oldest comes first
+	local rev = {}
 	for i = #dt, 1, -1 do
-		reversed[#reversed + 1] = dt[i]
+		rev[#rev + 1] = dt[i]
 	end
-	for i = 1, #reversed do
-		dt[i] = reversed[i]
+	for i = 1, #rev do
+		dt[i] = rev[i]
 	end
 end
 
