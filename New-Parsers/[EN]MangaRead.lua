@@ -175,7 +175,9 @@ function MangaReader:getPopularManga(page, dt)
 	for block in content:gmatch('<div id="manga%-item%-%d+".-</div>%s*</div>') do
 		local Img = block:match('<img.-src="([^"]+)"')
 		local Link, Name = block:match('<h3 class="h5">%s*<a href="([^"]+)">%s*(.-)%s*</a>')
-    
+        if Img and Img:match("%.webp$") then
+			Img = Img:gsub("%.webp$", ".jpg")
+		end
 		if Img and Link and Name then
 			dt[#dt + 1] = CreateManga(stringify(Name), Link, Img, self.ID, Link)
 			dt.NoPages = false
@@ -258,7 +260,9 @@ function MangaReader:getLatestManga(page, dt)
 	for block in content:gmatch('<div id="manga%-item%-%d+".-</div>%s*</div>') do
 		local Img = block:match('<img.-src="([^"]+)"')
 		local Link, Name = block:match('<h3 class="h5">%s*<a href="([^"]+)">%s*(.-)%s*</a>')
-
+        if Img and Img:match("%.webp$") then
+			Img = Img:gsub("%.webp$", ".jpg")
+		end
 		if Img and Link and Name then
 			dt[#dt + 1] = CreateManga(stringify(Name), Link, Img, self.ID, Link)
 			dt.NoPages = false
